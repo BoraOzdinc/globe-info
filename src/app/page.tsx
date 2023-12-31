@@ -1,6 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import CustomGlobe from "./components/CustomGlobe";
+import dynamic from "next/dynamic";
+
+const CustomGlobe = dynamic(() => import("./components/CustomGlobe"), {
+  ssr: false,
+});
 import axios from "axios";
 import { Country, CountryResponse, StatesResponse } from "./components/type";
 
@@ -35,10 +39,14 @@ export default function Home() {
   const [SelectedCountry, setSelectedCountry] = useState<string>();
   const [CountryData, setCountryData] = useState<Country>();
   const [loading, setLoading] = useState<boolean>(true);
-  const vw = Math.max(
-    document.documentElement.clientWidth || 0,
-    window.innerWidth || 0
-  );
+  let vw = 1920;
+
+  if (typeof window !== "undefined") {
+    vw = Math.max(
+      document.documentElement.clientWidth || 0,
+      window.innerWidth || 0
+    );
+  }
   getCountry("Turkey");
   getStates("Turkey");
   /*  useEffect(() => {
