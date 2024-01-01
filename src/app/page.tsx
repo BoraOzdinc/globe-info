@@ -7,6 +7,8 @@ const CustomGlobe = dynamic(() => import("./components/CustomGlobe"), {
 });
 import axios from "axios";
 import { Country, CountryResponse, StatesResponse } from "./components/type";
+import useSWR from "swr";
+import { fetcher } from "@/api";
 
 export default function Home() {
   const mockData: Country = {
@@ -39,57 +41,42 @@ export default function Home() {
   const [SelectedCountry, setSelectedCountry] = useState<string>();
   const [CountryData, setCountryData] = useState<Country>();
   const [loading, setLoading] = useState<boolean>(true);
+  const { data, isLoading, error } = useSWR(`${SelectedCountry}`, fetcher, {
+    errorRetryCount: 0,
+  });
+  console.log(data);
   let vw = 1920;
-
   if (typeof window !== "undefined") {
     vw = Math.max(
       document.documentElement.clientWidth || 0,
       window.innerWidth || 0
     );
-  }
-  getCountry("Turkey");
-  getStates("Turkey");
-  /*  useEffect(() => {
-    setLoading(true);
-    if (SelectedCountry) {
-      setCountryData(
-        getCountry(SelectedCountry).then(async (value) => {
-          return await value;
-        })
-      );
-
-      setLoading(false);
+    if (vw > 1024) {
+      vw = (vw / 4) * 3;
     }
-  }, [SelectedCountry]); */
-
-  console.log("country data", CountryData);
-  console.log("loading", loading);
+  }
 
   return (
-    <div className=" max-h-screen flex flex-row">
+    <div className=" max-h-screen flex flex-col lg:flex-row">
       <div className="m-3 p-3 h-max w-full border-2 border-blue-50 rounded">
-        <div className="text-xl">
-          <p>Country Name: {mockData.name}</p>
-          <p>Capital City: {mockData.capital}</p>
-          <p>Currency: {mockData.currency}</p>
-          <p>Population: {mockData.population} people</p>
-          <p>Size: {mockData.size}</p>
-          <p>Continent: {mockData.continent}</p>
-          <img src={mockData.href.flag} alt={mockData.iso2} />
-        </div>
-        {/* {!SelectedCountry ? (
-          <div>Please Select a Country.</div>
-        ) : loading ? (
-          <div>Loading...</div>
-        ) : (
+        {!SelectedCountry && <div>Please Select a Country</div>}
+        {SelectedCountry && error && <div>{error.message}</div>}
+        {isLoading && <div>Loading...</div>}
+        {data && (
           <div className="text-xl">
-            <p>{mockData.name.common}</p>
+            <p>Country Name: {data.data.name}</p>
+            <p>Capital City: {data.data.capital}</p>
+            <p>Currency: {data.data.currency}</p>
+            <p>Population: {data.data.population} people</p>
+            <p>Size: {data.data.size}</p>
+            <p>Continent: {data.data.continent}</p>
+            <img src={data.data.href.flag} alt={data.data.iso2} />
           </div>
-        )} */}
+        )}
       </div>
 
       <div className="">
-        <CustomGlobe setCountry={setSelectedCountry} vw={(vw / 4) * 3} />
+        <CustomGlobe setCountry={setSelectedCountry} vw={vw} />
       </div>
     </div>
   );
@@ -107,7 +94,7 @@ async function getCountry(countryName: string | undefined) {
       }
     );
 
-    return await data.data;
+    return data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("error message: ", error.message);
@@ -128,7 +115,7 @@ async function getStates(countryName: string | undefined) {
       }
     );
 
-    return await data.data;
+    return data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("error message: ", error.message);
