@@ -19,7 +19,7 @@ export default function CustomGlobe({setCountry,vw}) {
 
   const onClick=(data)=>{
 setLiftD(data)
-setCountry(data.properties.ADMIN)
+setCountry(data.properties.SUBUNIT)
   }
 
   return (

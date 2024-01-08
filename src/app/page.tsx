@@ -1,46 +1,18 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 
 const CustomGlobe = dynamic(() => import("./components/CustomGlobe"), {
   ssr: false,
 });
 import axios from "axios";
-import { Country, CountryResponse, StatesResponse } from "./components/type";
+import { CountryResponse, StatesResponse } from "./components/type";
 import useSWR from "swr";
 import { fetcher } from "@/api";
 
 export default function Home() {
-  const mockData: Country = {
-    name: "Turkey",
-    full_name: "Republic of Turkey",
-    capital: "Ankara",
-    iso2: "TR",
-    iso3: "TUR",
-    covid19: {
-      total_case: "494,351",
-      total_deaths: "13,558",
-      last_updated: "2020-12-01T08:35:30.000000Z",
-    },
-    current_president: null,
-    currency: "TRY",
-    phone_code: "90",
-    continent: "Asia",
-    description: null,
-    size: "783,562 km\u00b2",
-    independence_date: null,
-    population: "84,726,208",
-    href: {
-      self: "https://restfulcountries.com/api/v1/countries/Turkey",
-      states: "https://restfulcountries.com/api/v1/countries/Turkey/states",
-      presidents:
-        "https://restfulcountries.com/api/v1/countries/Turkey/presidents",
-      flag: "https://restfulcountries.com/assets/images/flags/Turkey.png",
-    },
-  };
   const [SelectedCountry, setSelectedCountry] = useState<string>();
-  const [CountryData, setCountryData] = useState<Country>();
-  const [loading, setLoading] = useState<boolean>(true);
   const { data, isLoading, error } = useSWR(`${SelectedCountry}`, fetcher, {
     errorRetryCount: 0,
   });
@@ -85,8 +57,8 @@ export default function Home() {
 async function getCountry(countryName: string | undefined) {
   try {
     const { data } = await axios.get<CountryResponse>(
-      `https://restfulcountries.com/api/v1/countries/${countryName}`,
-      {
+      " https://restfulcountries.com/api/v1/countries",
+      /* `https://restfulcountries.com/api/v1/countries/${countryName}` */ {
         headers: {
           Accept: "application/json",
           Authorization: "Bearer 478|OXVbGWmXuGs1DdSvxB7d4J7o4On7sCMdqIEsb6Nq",
